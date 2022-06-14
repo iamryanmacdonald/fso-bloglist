@@ -18,7 +18,23 @@ const favoriteBlog = (blogs) => {
   return blog;
 };
 
+const mostBlogs = (blogs) => {
+  const authored_blogs = blogs.reduce(
+    (previous, current) =>
+      current.author in previous
+        ? { ...previous, [current.author]: previous[current.author] + 1 }
+        : { ...previous, [current.author]: 1 },
+    {}
+  );
+
+  const author = Object.keys(authored_blogs).reduce((previous, current) =>
+    authored_blogs[previous] > authored_blogs[current] ? previous : current
+  );
+
+  return { author, blogs: authored_blogs[author] };
+};
+
 const totalLikes = (blogs) =>
   blogs.reduce((previous, current) => (previous += current.likes), 0);
 
-module.exports = { dummy, favoriteBlog, totalLikes };
+module.exports = { dummy, favoriteBlog, mostBlogs, totalLikes };

@@ -110,3 +110,17 @@ describe("favorite blog", () => {
     });
   });
 });
+
+describe("most blogs", () => {
+  test("when list has only one blog is the author of that blog", () => {
+    const result = listHelper.mostBlogs(listWithOneBlog);
+
+    expect(result).toEqual({ author: "Edsger W. Dijkstra", blogs: 1 });
+  });
+
+  test("of a bigger list is calculated right", () => {
+    const result = listHelper.mostBlogs(listWithMultipleBlogs);
+
+    expect(result).toEqual({ author: "Robert C. Martin", blogs: 3 });
+  });
+});
