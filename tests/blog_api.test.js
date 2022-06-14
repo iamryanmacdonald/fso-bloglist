@@ -33,6 +33,28 @@ test("returned blogs have id parameter", async () => {
   expect(response.body[0].id).toBeDefined();
 });
 
+test("a valid blog can be added", async () => {
+  const newBlog = {
+    title: "Learn to code in 2019, get hired, and have fun along the way",
+    author: "Andrei Naegoie",
+    url: "https://medium.com/zerotomastery/learn-to-code-in-2019-get-hired-and-have-fun-along-the-way-d4197f96be27",
+    likes: 2,
+  };
+
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const blogs = await helper.blogsInDb();
+
+  expect(blogs).toHaveLength(helper.initialBlogs.length + 1);
+  expect(blogs.map((blog) => blog.title)).toContain(
+    "Learn to code in 2019, get hired, and have fun along the way"
+  );
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
