@@ -9,7 +9,7 @@ router.get("/", async (request, response) => {
 });
 
 router.post("/", async (request, response) => {
-  const blog = new Blog(request.body);
+  const blog = new Blog({ ...request.body, likes: request.body.likes || 0 });
 
   const savedBlog = await blog.save();
 

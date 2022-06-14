@@ -55,6 +55,19 @@ test("a valid blog can be added", async () => {
   );
 });
 
+test("a valid blog with no likes parameter automatically sets it to zero", async () => {
+  const newBlog = {
+    title: "Learn to code in 2019, get hired, and have fun along the way",
+    author: "Andrei Naegoie",
+    url: "https://medium.com/zerotomastery/learn-to-code-in-2019-get-hired-and-have-fun-along-the-way-d4197f96be27",
+  };
+
+  const response = await api.post("/api/blogs").send(newBlog);
+
+  expect(response.statusCode).toBe(201);
+  expect(response.body.likes).toBe(0);
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
