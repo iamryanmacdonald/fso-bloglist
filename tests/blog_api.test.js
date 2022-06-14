@@ -55,7 +55,7 @@ test("a valid blog can be added", async () => {
   );
 });
 
-test("a valid blog with no likes parameter automatically sets it to zero", async () => {
+test("blog without likes is added with likes set to zero", async () => {
   const newBlog = {
     title: "Learn to code in 2019, get hired, and have fun along the way",
     author: "Andrei Naegoie",
@@ -66,6 +66,24 @@ test("a valid blog with no likes parameter automatically sets it to zero", async
 
   expect(response.statusCode).toBe(201);
   expect(response.body.likes).toBe(0);
+});
+
+test("blog without title is not added", async () => {
+  const newBlog = {
+    author: "Andrei Naegoie",
+    url: "https://medium.com/zerotomastery/learn-to-code-in-2019-get-hired-and-have-fun-along-the-way-d4197f96be27",
+  };
+
+  await api.post("/api/blogs").send(newBlog).expect(400);
+});
+
+test("blog without url is not added", async () => {
+  const newBlog = {
+    title: "Learn to code in 2019, get hired, and have fun along the way",
+    author: "Andrei Naegoie",
+  };
+
+  await api.post("/api/blogs").send(newBlog).expect(400);
 });
 
 afterAll(() => {
