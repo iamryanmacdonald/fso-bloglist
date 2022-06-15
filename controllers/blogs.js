@@ -22,4 +22,12 @@ router.post("/", async (request, response) => {
   response.status(201).json(savedBlog);
 });
 
+router.put("/:id", async (request, response) => {
+  const body = request.body;
+
+  const blog = await Blog.findByIdAndUpdate(request.params.id, body);
+
+  response.json(blog);
+});
+
 module.exports = router;

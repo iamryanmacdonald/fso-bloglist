@@ -106,6 +106,34 @@ describe("deletion of a blog", () => {
   });
 });
 
+describe("update of an existing blog", () => {
+  test("returns the blog as json", async () => {
+    const startBlogs = await helper.blogsInDb();
+    const updatedBlogIndex = Math.floor(Math.random() * startBlogs.length);
+    const updatedBlog = startBlogs[updatedBlogIndex];
+
+    const oldTitle = updatedBlog.title;
+    const newTitle = "This is a new, test title";
+
+    await api
+      .put(`/api/blogs/${updatedBlog.id}`)
+      .send({
+        title: newTitle,
+        author: updatedBlog.author,
+        url: updatedBlog.url,
+        likes: updatedBlog.liked,
+      })
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const endBlogs = await helper.blogsInDb();
+    const endBlogTitles = endBlogs.map((blog) => blog.title);
+
+    expect(endBlogTitles).toContain(newTitle);
+    expect(endBlogTitles).not.toContain(oldTitle);
+  });
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
