@@ -2,6 +2,12 @@ const router = require("express").Router();
 
 const Blog = require("../models/blog");
 
+router.delete("/:id", async (request, response) => {
+  await Blog.findByIdAndDelete(request.params.id);
+
+  response.status(204).end();
+});
+
 router.get("/", async (request, response) => {
   const blogs = await Blog.find({});
 
