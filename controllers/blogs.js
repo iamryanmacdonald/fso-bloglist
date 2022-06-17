@@ -5,16 +5,6 @@ const Blog = require("../models/blog");
 const User = require("../models/user");
 const config = require("../utils/config");
 
-const getTokenFrom = (request) => {
-  const authorization = request.get("authorization");
-
-  if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
-    return authorization.substring(7);
-  }
-
-  return null;
-};
-
 router.delete("/:id", async (request, response) => {
   await Blog.findByIdAndDelete(request.params.id);
 
@@ -28,8 +18,7 @@ router.get("/", async (request, response) => {
 });
 
 router.post("/", async (request, response) => {
-  const token = getTokenFrom(request);
-  const decodedToken = jwt.verify(token, config.SECRET);
+  const decodedToken = jwt.verify(request.token, config.SECRET);
 
   if (!decodedToken.id) {
     return response.status(401).json({ error: "token missing or invalid" });
