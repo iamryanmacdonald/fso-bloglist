@@ -50,6 +50,54 @@ describe("when there is initially one user in the database", () => {
 
     expect(testUser.passwordHash).not.toBeDefined();
   });
+
+  test("user with no username is not added", async () => {
+    const newUser = {
+      name: "Mark",
+      password: "totally_real",
+    };
+
+    await api.post("/api/users").send(newUser).expect(400);
+  });
+
+  test("user with non-unique username is not added", async () => {
+    const newUser = {
+      username: "admin",
+      name: "Mark",
+      password: "totally_real",
+    };
+
+    await api.post("/api/users").send(newUser).expect(400);
+  });
+
+  test("user with username shorter than 3 characters is not added", async () => {
+    const newUser = {
+      username: "ad",
+      name: "Mark",
+      password: "totally_real",
+    };
+
+    await api.post("/api/users").send(newUser).expect(400);
+  });
+
+  test("user with no password is not added", async () => {
+    const newUser = {
+      username: "new_admin",
+      name: "Mark",
+    };
+
+    await api.post("/api/users").send(newUser).expect(400);
+  });
+
+  test("user with password shorter than 3 characters is not added", async () => {
+    const newUser = {
+      username: "new_admin",
+      name: "Mark",
+      password: "to",
+    };
+
+    await api.post("/api/users").send(newUser).expect(400);
+  });
 });
 
 afterAll(() => {
