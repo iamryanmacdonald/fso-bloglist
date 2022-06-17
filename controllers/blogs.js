@@ -1,18 +1,10 @@
 const router = require("express").Router();
-const jwt = require("jsonwebtoken");
 
 const Blog = require("../models/blog");
-const User = require("../models/user");
-const config = require("../utils/config");
+const middleware = require("../utils/middleware");
 
-router.delete("/:id", async (request, response) => {
-  const decodedToken = jwt.verify(request.token, config.SECRET);
-
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: "token missing or invalid" });
-  }
-
-  const user = await User.findById(decodedToken.id);
+router.delete("/:id", middleware.userExtractor, async (request, response) => {
+  const user = request.user;
 
   const blog = await Blog.findById(request.params.id);
 
@@ -33,14 +25,8 @@ router.get("/", async (request, response) => {
   response.json(blogs);
 });
 
-router.post("/", async (request, response) => {
-  const decodedToken = jwt.verify(request.token, config.SECRET);
-
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: "token missing or invalid" });
-  }
-
-  const user = await User.findById(decodedToken.id);
+router.post("/", middleware.userExtractor, async (request, response) => {
+  const user = request.user;
 
   const blog = new Blog({
     ...request.body,
@@ -56,12 +42,20 @@ router.post("/", async (request, response) => {
   response.status(201).json(savedBlog);
 });
 
-router.put("/:id", async (request, response) => {
-  const body = request.body;
+router.put("/:id", middleware.userExtractor, async (request, response) => {
+  const user = request.user;
 
-  const blog = await Blog.findByIdAndUpdate(request.params.id, body);
+  const blog = await Blog.findById(request.params.id);
 
-  response.json(blog);
+  if (user.id === blog.user.toString()) {
+    await blog.update(request.body);
+
+    response.json(blog);
+  } else {
+    response
+      .status(401)
+      .json({ error: "cannot update blog that you did not post" });
+  }
 });
 
 module.exports = router;
