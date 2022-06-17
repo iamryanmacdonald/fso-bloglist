@@ -6,9 +6,25 @@ const User = require("../models/user");
 const config = require("../utils/config");
 
 router.delete("/:id", async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id);
+  const decodedToken = jwt.verify(request.token, config.SECRET);
 
-  response.status(204).end();
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: "token missing or invalid" });
+  }
+
+  const user = await User.findById(decodedToken.id);
+
+  const blog = await Blog.findById(request.params.id);
+
+  if (user.id === blog.user.toString()) {
+    await blog.delete();
+
+    response.status(204).end();
+  } else {
+    response
+      .status(401)
+      .json({ error: "cannot delete blog that you did not post" });
+  }
 });
 
 router.get("/", async (request, response) => {
