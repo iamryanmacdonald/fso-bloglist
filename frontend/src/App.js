@@ -6,6 +6,7 @@ import loginService from "./services/login";
 const App = () => {
   const [author, setAuthor] = useState("");
   const [blogs, setBlogs] = useState([]);
+  const [notification, setNotification] = useState({ message: "", type: "" });
   const [password, setPassword] = useState("");
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
@@ -22,8 +23,21 @@ const App = () => {
       setTitle("");
       setAuthor("");
       setUrl("");
+
+      setNotification({
+        message: `a new blog ${blog.title} by ${blog.author} added`,
+        type: "notification",
+      });
+
+      setTimeout(() => {
+        setNotification({ message: "", type: "" });
+      }, 5000);
     } catch (err) {
-      console.log(err);
+      setNotification({ message: err.response.data.error, type: "error" });
+
+      setTimeout(() => {
+        setNotification({ message: "", type: "" });
+      }, 5000);
     }
   };
 
@@ -38,8 +52,21 @@ const App = () => {
       blogService.setToken(user.token);
       setUsername("");
       setPassword("");
+
+      setNotification({
+        message: `Logged in as ${user.name}`,
+        type: "notification",
+      });
+
+      setTimeout(() => {
+        setNotification({ message: "", type: "" });
+      }, 5000);
     } catch (err) {
-      console.log(err);
+      setNotification({ message: err.response.data.error, type: "error" });
+
+      setTimeout(() => {
+        setNotification({ message: "", type: "" });
+      }, 5000);
     }
   };
 
@@ -52,6 +79,7 @@ const App = () => {
   const loginForm = () => (
     <form onSubmit={handleLogin}>
       <h2>log in to application</h2>
+      {notificationBar()}
       <div>
         username
         <input
@@ -74,6 +102,39 @@ const App = () => {
     </form>
   );
 
+  const notificationBar = () => {
+    if (notification.message === "") return null;
+
+    let color;
+
+    switch (notification.type) {
+      case "error":
+        color = "red";
+        break;
+      case "notification":
+        color = "green";
+        break;
+      default:
+        color = "black";
+    }
+
+    return (
+      <div
+        style={{
+          background: "lightgray",
+          borderRadius: "5px",
+          borderStyle: "solid",
+          color,
+          fontSize: "20px",
+          marginBottom: "20px",
+          padding: "10px",
+        }}
+      >
+        {notification.message}
+      </div>
+    );
+  };
+
   useEffect(() => {
     const user_token = window.localStorage.getItem("user");
 
@@ -88,6 +149,7 @@ const App = () => {
   return user ? (
     <div>
       <h2>blogs</h2>
+      {notificationBar()}
       <div>
         {user.name} logged in <button onClick={logout}>logout</button>
       </div>
