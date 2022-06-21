@@ -20,8 +20,20 @@ const getAll = () => {
   return request.then((response) => response.data);
 };
 
+const remove = async (blog) => {
+  const config = {
+    headers: {
+      authorization: token,
+    },
+  };
+
+  const response = await axios.delete(`${baseUrl}/${blog.id}`, config);
+
+  return response.data;
+};
+
 const setToken = (newToken) => {
   token = `bearer ${newToken}`;
 };
 
-export default { create, getAll, setToken };
+export default { create, getAll, remove, setToken };

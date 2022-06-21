@@ -134,6 +134,21 @@ const App = () => {
     );
   };
 
+  const removeBlog = (blog) => {
+    blogService
+      .remove(blog)
+      .then(() => {
+        setBlogs(blogs.filter((checkBlog) => blog.id !== checkBlog.id));
+      })
+      .catch((error) => {
+        setNotification({ message: error.response.data.error, type: "error" });
+
+        setTimeout(() => {
+          setNotification({ message: "", type: "" });
+        }, 5000);
+      });
+  };
+
   useEffect(() => {
     const user_token = window.localStorage.getItem("user");
 
@@ -161,7 +176,7 @@ const App = () => {
       </Togglable>
       <br />
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} removeBlog={removeBlog} />
       ))}
     </div>
   ) : (
