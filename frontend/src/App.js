@@ -1,49 +1,43 @@
 import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
+import BlogForm from "./components/BlogForm";
 import Togglable from "./components/Togglable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
 const App = () => {
-  const [author, setAuthor] = useState("");
   const [blogs, setBlogs] = useState([]);
   const [notification, setNotification] = useState({ message: "", type: "" });
   const [password, setPassword] = useState("");
-  const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
 
   const blogFormRef = useRef();
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
+  const addBlog = (newBlog) => {
+    blogService
+      .create(newBlog)
+      .then((returnedBlog) => {
+        setBlogs(blogs.concat(returnedBlog));
 
-    try {
-      const blog = await blogService.create({ title, author, url });
+        blogFormRef.current.toggleVisibility();
 
-      setBlogs(blogs.concat(blog));
-      setTitle("");
-      setAuthor("");
-      setUrl("");
+        setNotification({
+          message: `a new blog ${returnedBlog.title} by ${returnedBlog.author} added`,
+          type: "notification",
+        });
 
-      blogFormRef.current.toggleVisibility();
+        setTimeout(() => {
+          setNotification({ message: "", type: "" });
+        }, 5000);
+      })
+      .catch((error) => {
+        setNotification({ message: error.response.data.error, type: "error" });
 
-      setNotification({
-        message: `a new blog ${blog.title} by ${blog.author} added`,
-        type: "notification",
+        setTimeout(() => {
+          setNotification({ message: "", type: "" });
+        }, 5000);
       });
-
-      setTimeout(() => {
-        setNotification({ message: "", type: "" });
-      }, 5000);
-    } catch (err) {
-      setNotification({ message: err.response.data.error, type: "error" });
-
-      setTimeout(() => {
-        setNotification({ message: "", type: "" });
-      }, 5000);
-    }
   };
 
   const handleLogin = async (e) => {
@@ -146,6 +140,7 @@ const App = () => {
     if (user_token) {
       const user = JSON.parse(user_token);
       setUser(user);
+      blogService.setToken(user.token);
     }
 
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -160,37 +155,7 @@ const App = () => {
       </div>
       <br />
       <Togglable buttonLabel="new note" ref={blogFormRef}>
-        <h2>create new</h2>
-        <form onSubmit={handleCreate}>
-          <div>
-            title:
-            <input
-              type="text"
-              value={title}
-              name="Title"
-              onChange={({ target }) => setTitle(target.value)}
-            />
-          </div>
-          <div>
-            author:
-            <input
-              type="text"
-              value={author}
-              name="Author"
-              onChange={({ target }) => setAuthor(target.value)}
-            />
-          </div>
-          <div>
-            url:
-            <input
-              type="text"
-              value={url}
-              name="URL"
-              onChange={({ target }) => setUrl(target.value)}
-            />
-          </div>
-          <button type="submit">create</button>
-        </form>
+        <BlogForm createBlog={addBlog} />
       </Togglable>
       <br />
       {blogs.map((blog) => (
