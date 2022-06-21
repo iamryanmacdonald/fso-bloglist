@@ -19,7 +19,9 @@ const Blog = ({ blog, removeBlog }) => {
     <div style={blogStyle}>
       <div className="blogHeader">
         {blog.title} {blog.author}{" "}
-        <button onClick={toggleVisibility}>{visible ? "hide" : "view"}</button>
+        <button className="toggleVisibility" onClick={toggleVisibility}>
+          {visible ? "hide" : "view"}
+        </button>
       </div>
       <div className="blogInfo" style={{ display: visible ? "" : "none" }}>
         <div>{blog.url}</div>

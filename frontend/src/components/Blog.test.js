@@ -1,6 +1,7 @@
 import React from "react";
 import "@testing-library/jest-dom/extend-expect";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import Blog from "./Blog";
 
@@ -30,5 +31,13 @@ describe("<Blog />", () => {
       "display: none"
     );
     expect(container.querySelector(".blogInfo")).toHaveStyle("display: none");
+  });
+
+  test("clicking the view button shows the content", async () => {
+    const user = userEvent.setup()
+    const button = container.querySelector(".toggleVisibility");
+    await user.click(button)
+
+    expect(container.querySelector('.blogInfo')).not.toHaveStyle('display: none')
   });
 });
