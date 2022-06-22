@@ -24,12 +24,14 @@ const Blog = ({ blog, removeBlog }) => {
         </button>
       </div>
       <div className="blogInfo" style={{ display: visible ? "" : "none" }}>
-        <div>{blog.url}</div>
-        <div>
+        <div id="blogUrl">{blog.url}</div>
+        <div id="blogLikes">
           likes {blog.likes} <button>like</button>
         </div>
-        <div>{blog.author}</div>
-        <button onClick={() => removeBlog(blog)}>remove</button>
+        <div id="blogAuthor">{blog.author}</div>
+        <button onClick={() => removeBlog(blog)} id="remove">
+          remove
+        </button>
       </div>
     </div>
   );

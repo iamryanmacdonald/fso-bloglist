@@ -11,6 +11,13 @@ describe("Blog app", function () {
     url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
   };
 
+  const blog2 = {
+    title: "First class tests",
+    author: "Robert C. Martin",
+    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
+    likes: 5,
+  };
+
   beforeEach(function () {
     cy.request("POST", "http://localhost:3003/api/testing/reset");
     cy.request("POST", "http://localhost:3003/api/users", user);
@@ -53,8 +60,24 @@ describe("Blog app", function () {
       cy.get("#url").type(blog.url);
       cy.get("#create").click();
 
-      cy.get("#notification").should("contain", `a new blog ${blog.title} by ${blog.author} added`);
-      cy.get('.blogHeader').should('contain', blog.title)
+      cy.get("#notification").should(
+        "contain",
+        `a new blog ${blog.title} by ${blog.author} added`
+      );
+      cy.get(".blogHeader").should("contain", blog.title);
+    });
+
+    it("user can delete their own blog", function () {
+      cy.contains("new blog").click();
+      cy.get("#title").type(blog.title);
+      cy.get("#author").type(blog.author);
+      cy.get("#url").type(blog.url);
+      cy.get("#create").click();
+
+      cy.get(".toggleVisibility").click();
+      cy.get("#remove").click();
+
+      cy.get(".blogHeader").should("not.exist");
     });
   });
 });
