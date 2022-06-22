@@ -5,6 +5,12 @@ describe("Blog app", function () {
     password: "password",
   };
 
+  const blog = {
+    title: "Canonical string reduction",
+    author: "Edsger W. Dijkstra",
+    url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+  };
+
   beforeEach(function () {
     cy.request("POST", "http://localhost:3003/api/testing/reset");
     cy.request("POST", "http://localhost:3003/api/users", user);
@@ -30,6 +36,25 @@ describe("Blog app", function () {
       cy.contains("login").click();
 
       cy.get("#notification").should("contain", "invalid username or password");
+    });
+  });
+
+  describe("When logged in", function () {
+    beforeEach(function () {
+      cy.get("#username").type(user.username);
+      cy.get("#password").type(user.password);
+      cy.contains("login").click();
+    });
+
+    it("A blog can be created", function () {
+      cy.contains("new blog").click();
+      cy.get("#title").type(blog.title);
+      cy.get("#author").type(blog.author);
+      cy.get("#url").type(blog.url);
+      cy.get("#create").click();
+
+      cy.get("#notification").should("contain", `a new blog ${blog.title} by ${blog.author} added`);
+      cy.get('.blogHeader').should('contain', blog.title)
     });
   });
 });
